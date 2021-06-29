@@ -60,7 +60,7 @@ export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRe
   return (
     <MonacoEditor
       width="500"
-      height="300"
+      height="200"
       language="javascript"
       theme="vs-dark"
       defaultValue={initialCode}

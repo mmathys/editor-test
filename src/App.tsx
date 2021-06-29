@@ -1,15 +1,14 @@
 import { Server, TextOperation } from "ot"
-import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from "react"
-import MonacoEditor, { monaco } from "react-monaco-editor"
+import React, { useEffect, useRef, useState } from "react"
 import { initialCode } from "."
 import "./App.css"
 import { Client, ClientRef } from "./Client"
-import convertChangeEventToOperation from "./util/event-to-transform"
 import styled from "styled-components"
 
 const InputContainer = styled.div`
   display: flex;
   align-items: center;
+  flex-direction: row;
   p:after {
     content: " ";
     white-space: pre;
@@ -31,7 +30,6 @@ function App() {
     refs.current = refs.current.slice(0, numClients)
   })
 
-  
   const onClientSend = (idx: number, revision: number, operation: TextOperation) => {
     const transformedOp = server.receiveOperation(revision, operation)
     setServerCode(server.document)
@@ -63,7 +61,7 @@ function App() {
     <div>
       <p>Server view: {serverCode}</p>
       <InputContainer>
-        <p>Delay:</p>
+        <p>Delay (ms):</p>
         <input onChange={onDelayChange} type="number" min="0"></input>
       </InputContainer>
       {clients}
