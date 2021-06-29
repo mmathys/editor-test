@@ -10,7 +10,7 @@ const options = {
 
 export type ClientProps = {
   id: number
-  onSend: (revision: number, operation: TextOperation) => void
+  onSend: (id: number, revision: number, operation: TextOperation) => void
 }
 
 export type ClientRef = {
@@ -26,7 +26,7 @@ export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRe
   class OtClient extends ot.Client {
     sendOperation(revision: number, operation: TextOperation) {
       console.log(`[${id}] sending`, revision, operation)
-      onSend(revision, operation)
+      onSend(id, revision, operation)
     }
     applyOperation(operation: TextOperation) {
       console.log(`[${id}] applying`, operation)
