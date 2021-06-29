@@ -1772,6 +1772,11 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
+"@types/ot@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@types/ot/-/ot-0.0.4.tgz#6fc6ee66202bef29f1e239eabd6c82e1a684af75"
+  integrity sha512-YSET055YRaMqgYP7eR/gNoF36EOzcaHutN7eBMErFoTzb/yWznFJX54lrqUUZ79OTm1C7jF4Ajyeyon0isBdmw==
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -7266,6 +7271,11 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
+monaco-editor@*:
+  version "0.25.2"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.25.2.tgz#119e2b15bbd968a1a99c03cac9c329316d7c37e9"
+  integrity sha512-5iylzSJevCnzJn9UVsW8yOZ3yHjmAs4TfvH3zsbftKiFKmHG0xirGN6DK9Kk04VSWxYCZZAIafYJoNJJMAU1KA==
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -7701,6 +7711,11 @@ os-browserify@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.3.0.tgz#854373c7f5c2315914fc9bfc6bd8238fdda1ec27"
   integrity sha1-hUNzx/XCMVkU/Jv8a9gjj92h7Cc=
+
+ot@^0.0.15:
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/ot/-/ot-0.0.15.tgz#98bd953e6283670a01868e7ef4d2d983a29cd6a7"
+  integrity sha1-mL2VPmKDZwoBho5+9NLZg6Kc1qc=
 
 p-each-series@^2.1.0:
   version "2.2.0"
@@ -9005,6 +9020,14 @@ react-is@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
+
+react-monaco-editor@^0.43.0:
+  version "0.43.0"
+  resolved "https://registry.yarnpkg.com/react-monaco-editor/-/react-monaco-editor-0.43.0.tgz#495578470db7b27ab306af813b31f206a6bf9d1c"
+  integrity sha512-2PXSDwOzjUDlwdsK8psrmezSB2lPnjLQ/SRNwqoRF2+TAB2n4Q+Bs1wGlWOZbU8WI7s6Wnni0+3PdT9nSPtzRA==
+  dependencies:
+    monaco-editor "*"
+    prop-types "^15.7.2"
 
 react-refresh@^0.8.3:
   version "0.8.3"
