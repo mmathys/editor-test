@@ -1,4 +1,4 @@
-import { forwardRef, Ref, useImperativeHandle, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import MonacoEditor, { monaco } from "react-monaco-editor"
 import { initialCode } from "."
 import convertChangeEventToOperation from "./util/event-to-transform"
@@ -10,23 +10,24 @@ const options = {
 
 export type ClientProps = {
   id: number
-  onSend: (id: number, revision: number, operation: TextOperation) => void
 }
 
-export type ClientRef = {
-  ack: () => void
-  update: (op: TextOperation) => void
-}
-
-export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRef>) => {
+export const Client = ({ id }: ClientProps) => {
   const monacoRef = useRef<MonacoEditor>(null)
   const [localCode, setLocalCode] = useState<string>(initialCode)
   const [applyingFromServer, setApplyingFromServer] = useState<boolean>(false)
+  
+  const ws = useRef<WebSocket | null>(null)
+  useEffect(() => {
+    console.log("connect websocket")
+    ws.current = new WebSocket(`ws://localhost:6666/${id}`)
+  }, [])
+  
 
   class OtClient extends ot.Client {
     sendOperation(revision: number, operation: TextOperation) {
       console.log(`[${id}] sending`, revision, operation)
-      onSend(id, revision, operation)
+      ws.current!.send(JSON.stringify({ revision, operation }))
     }
     applyOperation(operation: TextOperation) {
       console.log(`[${id}] applying`, operation)
@@ -39,6 +40,23 @@ export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRe
 
   const [client, setClient] = useState<OtClient>(new OtClient(0))
 
+  useEffect(() => {
+    if (ws.current != null) {
+      ws.current.onmessage = (event) => {
+        let payload = JSON.parse(event.data)
+        console.log(id, payload)
+        if (payload.type === "update") {
+          const op = TextOperation.fromJSON(payload.op)
+          client.applyServer(op)
+        } else if (payload.type === "ack") {
+          client.serverAck()
+        } else {
+          console.error(`could not recognize type ${payload.type}.`)
+        }
+      }
+    }
+  }, [ws])
+
   const onChange = (value: string, event: monaco.editor.IModelContentChangedEvent) => {
     if (applyingFromServer) return
     console.log("onChange", value, event)
@@ -46,16 +64,6 @@ export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRe
     setLocalCode(newCode)
     client.applyClient(operation)
   }
-
-  useImperativeHandle(ref, () => ({
-    ack: () => {
-      console.log("ack")
-      client.serverAck()
-    },
-    update: (op: TextOperation) => {
-      client.applyServer(op)
-    },
-  }))
 
   return (
     <MonacoEditor
@@ -69,7 +77,7 @@ export const Client = forwardRef(({ onSend, id }: ClientProps, ref: Ref<ClientRe
       ref={monacoRef}
     />
   )
-})
+}
 
 const applyOperationToMonaco = (operation: TextOperation, me: monaco.editor.IStandaloneCodeEditor) => {
   const ops = operation.ops
