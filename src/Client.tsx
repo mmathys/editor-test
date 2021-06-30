@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import MonacoEditor, { monaco } from "react-monaco-editor"
-import { initialCode } from "."
 import convertChangeEventToOperation from "./util/event-to-transform"
 import ot, { TextOperation } from "ot"
 
@@ -14,18 +13,31 @@ export type ClientProps = {
 
 export const Client = ({ id }: ClientProps) => {
   const monacoRef = useRef<MonacoEditor>(null)
-  const [localCode, setLocalCode] = useState<string>(initialCode)
+  const [initialCode, setInitialCode] = useState<string | null>()
+  const baseRevision = useRef<number>(0)
+  const [localCode, setLocalCode] = useState<string | null>()
   const [applyingFromServer, setApplyingFromServer] = useState<boolean>(false)
-  
+
   const ws = useRef<WebSocket | null>(null)
   useEffect(() => {
     console.log("connect websocket")
     ws.current = new WebSocket(`ws://localhost:6666/${id}`)
   }, [])
-  
+
+  useEffect(() => {
+    async function fetchInitialCode() {
+      const res = await fetch("http://localhost:3100/content")
+      const obj = await res.json()
+      setInitialCode(obj.content)
+      setLocalCode(obj.content)
+      baseRevision.current = obj.revision
+    }
+    fetchInitialCode()
+  }, [])
 
   class OtClient extends ot.Client {
     sendOperation(revision: number, operation: TextOperation) {
+      revision += baseRevision.current
       console.log(`[${id}] sending`, revision, operation)
       ws.current!.send(JSON.stringify({ revision, operation }))
     }
@@ -58,15 +70,16 @@ export const Client = ({ id }: ClientProps) => {
   }, [ws])
 
   const onChange = (value: string, event: monaco.editor.IModelContentChangedEvent) => {
-    if (applyingFromServer) return
+    if (applyingFromServer || !localCode) return
     console.log("onChange", value, event)
     const { operation, newCode } = convertChangeEventToOperation(monacoRef.current!.editor!, event, localCode)
     setLocalCode(newCode)
     client.applyClient(operation)
   }
 
-  return (
-    <MonacoEditor
+  const editor = () => {
+    if (initialCode) {
+      return <MonacoEditor
       width="500"
       height="200"
       language="javascript"
@@ -76,7 +89,12 @@ export const Client = ({ id }: ClientProps) => {
       onChange={onChange}
       ref={monacoRef}
     />
-  )
+    }
+  }
+
+  return <div>
+    {editor()}
+  </div>
 }
 
 const applyOperationToMonaco = (operation: TextOperation, me: monaco.editor.IStandaloneCodeEditor) => {
