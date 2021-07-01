@@ -2,7 +2,7 @@ import "./App.css"
 import { Client } from "./Client"
 
 function App() {
-  const numClients = 2
+  const numClients = 1
   let ids = []
   for (let i = 0; i < numClients; i++) {
     ids.push(i)
