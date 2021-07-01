@@ -13,7 +13,7 @@ export type ClientProps = {
 
 export const Client = ({ id }: ClientProps) => {
   const monacoRef = useRef<MonacoEditor>(null)
-  const [initialCode, setInitialCode] = useState<string | null>()
+  const [initialCode, setInitialCode] = useState<string | null>(null)
   const baseRevision = useRef<number>(0)
   const [localCode, setLocalCode] = useState<string | null>()
   const [applyingFromServer, setApplyingFromServer] = useState<boolean>(false)
