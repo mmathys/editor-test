@@ -22,7 +22,7 @@ export const Client = ({ id }: ClientProps) => {
   useEffect(() => {
     console.log("connect websocket")
     ws.current = new WebSocket(`ws://${window.location.hostname}:6666/${id}`)
-  }, [])
+  }, [id])
 
   useEffect(() => {
     async function fetchInitialCode() {
@@ -50,6 +50,7 @@ export const Client = ({ id }: ClientProps) => {
     }
   }
 
+  // eslint-disable-next-line
   const [client, setClient] = useState<OtClient>(new OtClient(0))
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export const Client = ({ id }: ClientProps) => {
         }
       }
     }
-  }, [ws])
+  }, [ws, client, id])
 
   const onChange = (value: string, event: monaco.editor.IModelContentChangedEvent) => {
     if (applyingFromServer || !localCode) return
