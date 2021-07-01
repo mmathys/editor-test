@@ -21,12 +21,12 @@ export const Client = ({ id }: ClientProps) => {
   const ws = useRef<WebSocket | null>(null)
   useEffect(() => {
     console.log("connect websocket")
-    ws.current = new WebSocket(`ws://localhost:6666/${id}`)
+    ws.current = new WebSocket(`ws://${window.location.hostname}:6666/${id}`)
   }, [])
 
   useEffect(() => {
     async function fetchInitialCode() {
-      const res = await fetch("http://localhost:3100/content")
+      const res = await fetch(`http://${window.location.hostname}:3100/content`)
       const obj = await res.json()
       setInitialCode(obj.content)
       setLocalCode(obj.content)
@@ -78,23 +78,23 @@ export const Client = ({ id }: ClientProps) => {
   }
 
   const editor = () => {
-    if (initialCode) {
-      return <MonacoEditor
-      width="500"
-      height="200"
-      language="javascript"
-      theme="vs-dark"
-      defaultValue={initialCode}
-      options={options}
-      onChange={onChange}
-      ref={monacoRef}
-    />
+    if (initialCode !== null) {
+      return (
+        <MonacoEditor
+          width="800"
+          height="400"
+          language="javascript"
+          theme="vs-dark"
+          defaultValue={initialCode}
+          options={options}
+          onChange={onChange}
+          ref={monacoRef}
+        />
+      )
     }
   }
 
-  return <div>
-    {editor()}
-  </div>
+  return <div>{editor()}</div>
 }
 
 const applyOperationToMonaco = (operation: TextOperation, me: monaco.editor.IStandaloneCodeEditor) => {

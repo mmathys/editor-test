@@ -1,14 +1,13 @@
 const { Server, TextOperation } = require("ot")
 const WebSocket = require("ws")
 const wss = new WebSocket.Server({ port: 6666 })
-const express = require('express')
-const cors = require('cors')
+const express = require("express")
+const cors = require("cors")
 const app = express()
 const server = new Server("content")
 let revision = 0
 
 wss.on("connection", function connection(ws, req) {
-  //console.log("connected", req.url)
   ws.on("message", function incoming(message) {
     message = JSON.parse(message)
     console.log("got", message)
@@ -28,11 +27,10 @@ wss.on("connection", function connection(ws, req) {
   })
 })
 
-
 app.get("/content", cors(), (req, res) => {
   res.json({
-      content: server.document,
-      revision
+    content: server.document,
+    revision,
   })
 })
 
