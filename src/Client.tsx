@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import MonacoEditor, { monaco } from "react-monaco-editor"
 import convertChangeEventToOperation from "./util/event-to-transform"
 import ot, { TextOperation } from "ot"
+import environment from "./environment"
 
 const options = {
   selectOnLineNumbers: true,
@@ -21,14 +22,12 @@ export const Client = ({ id }: ClientProps) => {
   const ws = useRef<WebSocket | null>(null)
   useEffect(() => {
     console.log("connect websocket")
-    //ws.current = new WebSocket(`wss://api.monument.ax/ws/${id}`)
-    ws.current = new WebSocket(`ws://localhost:6666/${id}`)
+    ws.current = new WebSocket(`${environment.ws_endpoint}/${id}`)
   }, [id])
 
   useEffect(() => {
     async function fetchInitialCode() {
-      //const res = await fetch(`https://api.monument.ax/content`)
-      const res = await fetch(`http://localhost:3100/content`)
+      const res = await fetch(`${environment.endpoint}/content`)
       const obj = await res.json()
       setInitialCode(obj.content)
       setLocalCode(obj.content)
