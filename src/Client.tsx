@@ -15,18 +15,20 @@ export const Client = ({ id }: ClientProps) => {
   const monacoRef = useRef<MonacoEditor>(null)
   const [initialCode, setInitialCode] = useState<string | null>(null)
   const baseRevision = useRef<number>(0)
-  const [localCode, setLocalCode] = useState<string | null>()
+  const [localCode, setLocalCode] = useState<string | null>(null)
   const [applyingFromServer, setApplyingFromServer] = useState<boolean>(false)
 
   const ws = useRef<WebSocket | null>(null)
   useEffect(() => {
     console.log("connect websocket")
-    ws.current = new WebSocket(`ws://${window.location.hostname}:6666/${id}`)
+    //ws.current = new WebSocket(`wss://api.monument.ax/ws/${id}`)
+    ws.current = new WebSocket(`ws://localhost:6666/${id}`)
   }, [id])
 
   useEffect(() => {
     async function fetchInitialCode() {
-      const res = await fetch(`http://${window.location.hostname}:3100/content`)
+      //const res = await fetch(`https://api.monument.ax/content`)
+      const res = await fetch(`http://localhost:3100/content`)
       const obj = await res.json()
       setInitialCode(obj.content)
       setLocalCode(obj.content)
@@ -71,9 +73,9 @@ export const Client = ({ id }: ClientProps) => {
   }, [ws, client, id])
 
   const onChange = (value: string, event: monaco.editor.IModelContentChangedEvent) => {
-    if (applyingFromServer || !localCode) return
+    if (applyingFromServer || localCode === null) return
     console.log("onChange", value, event)
-    const { operation, newCode } = convertChangeEventToOperation(monacoRef.current!.editor!, event, localCode)
+    const { operation, newCode } = convertChangeEventToOperation(monacoRef.current!.editor!, event, localCode!)
     setLocalCode(newCode)
     client.applyClient(operation)
   }
