@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import MonacoEditor, { monaco } from "react-monaco-editor"
+import MonacoEditor, { EditorDidMount, monaco } from "react-monaco-editor"
 import convertChangeEventToOperation from "./util/event-to-transform"
 import ot, { TextOperation } from "ot"
 import environment from "./environment"
@@ -16,15 +16,18 @@ export const Client = ({ id }: ClientProps) => {
   const monacoRef = useRef<MonacoEditor>(null)
   const [initialCode, setInitialCode] = useState<string | null>(null)
   const baseRevision = useRef<number>(0)
-  const [localCode, setLocalCode] = useState<string | null>(null)
+  const [localCode, setLocalCode] = useState<string | null>(null)
   const [applyingFromServer, setApplyingFromServer] = useState<boolean>(false)
 
+  // websocket
   const ws = useRef<WebSocket | null>(null)
   useEffect(() => {
-    console.log("connect websocket")
-    ws.current = new WebSocket(`${environment.ws_endpoint}/${id}`)
+    const uri = `${environment.ws_endpoint}/${id}`
+    console.log("connecting websocket:", uri)
+    ws.current = new WebSocket(uri)
   }, [id])
 
+  // fetch initial code
   useEffect(() => {
     async function fetchInitialCode() {
       const res = await fetch(`${environment.endpoint}/content`)
@@ -36,6 +39,7 @@ export const Client = ({ id }: ClientProps) => {
     fetchInitialCode()
   }, [])
 
+  // ot client implementation
   class OtClient extends ot.Client {
     sendOperation(revision: number, operation: TextOperation) {
       revision += baseRevision.current
@@ -54,6 +58,7 @@ export const Client = ({ id }: ClientProps) => {
   // eslint-disable-next-line
   const [client, setClient] = useState<OtClient>(new OtClient(0))
 
+  // message handler
   useEffect(() => {
     if (ws.current != null) {
       ws.current.onmessage = (event) => {
@@ -71,6 +76,7 @@ export const Client = ({ id }: ClientProps) => {
     }
   }, [ws, client, id])
 
+  // onChange handler
   const onChange = (value: string, event: monaco.editor.IModelContentChangedEvent) => {
     if (applyingFromServer || localCode === null) return
     console.log("onChange", value, event)
@@ -79,17 +85,29 @@ export const Client = ({ id }: ClientProps) => {
     client.applyClient(operation)
   }
 
+  // onDidChangeCursorSelection handler
+  const onDidChangeCursorSelection = (e: monaco.editor.ICursorSelectionChangedEvent) => {
+    console.log(e.selection)
+  }
+
+  // register handlers
+  const mounted: EditorDidMount = (editor) => {
+    editor.onDidChangeCursorSelection(onDidChangeCursorSelection)
+  }
+
   const editor = () => {
     if (initialCode !== null) {
       return (
         <MonacoEditor
-          width="800"
-          height="400"
+          className="editor"
+          width="100vw"
+          height="100vh"
           language="javascript"
           theme="vs-dark"
           defaultValue={initialCode}
           options={options}
           onChange={onChange}
+          editorDidMount={mounted}
           ref={monacoRef}
         />
       )
